@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include "linenoise.hpp"
+#include "external/linenoise.hpp"
 
 using std::string;
 
