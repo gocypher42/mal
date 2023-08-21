@@ -9,23 +9,26 @@ using std::string;
 using std::unique_ptr;
 using std::vector;
 
-class MalValue {
+class MalValue
+{
 public:
   virtual ~MalValue() = default;
   virtual string to_string() const = 0;
 };
 
-class MalInteger : public MalValue {
+class MalInteger : public MalValue
+{
 public:
-  MalInteger(int value) : m_value(value) {}
+  MalInteger(long value) : m_value(value) {}
 
   string to_string() const override;
 
 private:
-  size_t m_value;
+  long m_value;
 };
 
-class MalSymbol : public MalValue {
+class MalSymbol : public MalValue
+{
 public:
   MalSymbol(string symbol) : m_symbol(std::move(symbol)) {}
 
@@ -35,38 +38,25 @@ private:
   string m_symbol;
 };
 
-class MalContainer : public MalValue {
-public:
-  virtual ~MalContainer() = default;
-  virtual size_t size() const;
-  virtual unique_ptr<MalValue> pop_front();
-  virtual void push_back(unique_ptr<MalValue> item);
+enum class ListWrapper
+{
+  Parentheses,
+  CurlyBraces,
+  SquareBrackets,
 };
 
-class MalList : public MalContainer {
+class MalList : public MalValue
+{
 public:
-  MalList() = default;
+  MalList(ListWrapper wrapper) : m_wrapper(wrapper) {}
 
-  size_t size() const override;
-  string to_string() const override;
+  size_t size() const;
+  string to_string() const;
 
-  unique_ptr<MalValue> pop_front() override;
-  void push_back(unique_ptr<MalValue> item) override;
+  unique_ptr<MalValue> pop_front();
+  void push_back(unique_ptr<MalValue> item);
 
 private:
-  vector<unique_ptr<MalValue>> m_items;
-};
-
-class MalVector : public MalContainer {
-public:
-  MalVector() = default;
-
-  size_t size() const override;
-  string to_string() const override;
-
-  unique_ptr<MalValue> pop_front() override;
-  void push_back(unique_ptr<MalValue> item) override;
-
-private:
+  ListWrapper m_wrapper;
   vector<unique_ptr<MalValue>> m_items;
 };
